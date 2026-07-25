@@ -1,10 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>내 첫 홈페이지</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네온 LED 전광판</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>안녕하세요!</h1>
-    <p>GitHub Pages로 만든 첫 웹사이트입니다.</p>
+    <div id="marquee-container" class="marquee-container theme-neon">
+        <div class="led-grid-overlay"></div>
+        <div class="display-stage">
+            <div id="marquee-text" class="marquee-text dir-rtl">원하는 문장을 입력하세요! 🚀</div>
+        </div>
+
+        <button id="btn-show-controls" class="floating-btn">⚙️ 설정</button>
+
+        <div id="control-panel" class="control-panel">
+            <div class="panel-header">
+                <h2>✨ 전광판 설정</h2>
+                <button id="btn-fullscreen" class="icon-btn">🖥️ 전체화면</button>
+                <button id="btn-hide-controls" class="icon-btn">✕</button>
+            </div>
+            <div class="panel-body">
+                <input type="text" id="text-input" value="원하는 문장을 입력하세요! 🚀">
+                <div class="btn-toggle-group">
+                    <button id="dir-rtl" class="btn-toggle active">오른쪽 ➔ 왼쪽</button>
+                    <button id="dir-ltr" class="btn-toggle">왼쪽 ➔ 오른쪽</button>
+                </div>
+                <button id="btn-play-pause" class="btn-primary">⏸️ 일시정지</button>
+                <input type="range" id="speed-range" min="1" max="10" value="5">
+                <input type="range" id="size-range" min="8" max="40" value="20">
+                <input type="color" id="text-color" value="#ff007f">
+                <input type="color" id="bg-color" value="#0a0a12">
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
