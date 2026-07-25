@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>네온 LED 전광판</title>
-    <!-- 폰트 로드 -->
+    <title>프리미엄 네온 LED 전광판</title>
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Do+Hyeon&family=Orbitron:wght@700;900&family=Pretendard:wght@400;700;900&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         html, body { width: 100%; height: 100%; overflow: hidden; background-color: #050508; font-family: 'Pretendard', sans-serif; color: #ffffff; }
-        
+
         .marquee-container {
             position: relative; width: 100vw; height: 100vh;
             display: flex; align-items: center; justify-content: center;
@@ -21,22 +21,37 @@
 
         .led-grid-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 2;
+            pointer-events: none; z-index: 5;
             background-image: radial-gradient(rgba(0, 0, 0, 0.75) 30%, transparent 35%);
-            background-size: 6px 6px; opacity: 0.6;
+            background-size: 6px 6px; opacity: 0.55;
         }
 
         .display-stage {
             position: relative; width: 100%; height: 100%;
-            display: flex; align-items: center; white-space: nowrap; overflow: hidden; z-index: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            white-space: nowrap; overflow: hidden; z-index: 2;
         }
+
+        /* 가운데 미디어 표시 영역 */
+        .center-media-container {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); z-index: 10;
+            max-width: 80vw; max-height: 70vh; pointer-events: none;
+        }
+        .center-media-container.active { display: flex; align-items: center; justify-content: center; }
+
+        .center-media-item {
+            max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 16px;
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.6), 0 0 60px rgba(0, 229, 255, 0.4);
+        }
+
+        .marquee-text-wrapper { position: relative; width: 100%; display: flex; align-items: center; white-space: nowrap; overflow: hidden; z-index: 3; }
 
         .marquee-text {
             display: inline-block; font-family: 'Black Han Sans', sans-serif;
             font-size: 20vw; font-weight: 900; line-height: 1.1; white-space: nowrap;
-            padding-left: 100vw; padding-right: 100vw; will-change: transform;
-            color: #ff007f;
-            text-shadow: 0 0 10px currentColor, 0 0 25px currentColor, 0 0 50px currentColor;
+            padding-left: 100vw; padding-right: 100vw; will-change: transform; color: #ff007f;
+            text-shadow: 0 0 12px currentColor, 0 0 30px currentColor, 0 0 60px currentColor;
         }
 
         .marquee-text.dir-rtl { animation: scroll-rtl var(--marquee-duration, 12s) linear infinite; }
@@ -46,82 +61,116 @@
         @keyframes scroll-rtl { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         @keyframes scroll-ltr { 0% { transform: translate3d(-100%, 0, 0); } 100% { transform: translate3d(0, 0, 0); } }
 
-        .rainbow-active {
+        /* 멀티컬러 특수 효과 */
+        .effect-rainbow {
             background: linear-gradient(90deg, #ff0055, #ff5000, #ffcc00, #00ff66, #00ccff, #a000ff, #ff0055);
-            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            animation-name: scroll-rtl, rainbow-glow; animation-duration: var(--marquee-duration, 12s), 4s;
-            animation-timing-function: linear, linear; animation-iteration-count: infinite, infinite;
+            background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: scroll-rtl var(--marquee-duration, 12s) linear infinite, rainbow-glow 4s linear infinite !important;
         }
-        @keyframes rainbow-glow { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-
-        .theme-neon { background-color: #080312; color: #ff007f; }
-        .theme-led-red { background-color: #0d0000; color: #ff1100; }
-        .theme-matrix { background-color: #000d03; color: #00ff44; }
-        .theme-gold { background-color: #120e00; color: #ffd700; }
+        .effect-cyber {
+            background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: scroll-rtl var(--marquee-duration, 12s) linear infinite, rainbow-glow 3s linear infinite !important;
+        }
+        .effect-fire {
+            background: linear-gradient(90deg, #ff0000, #ff7700, #ffea00, #ff0000);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: scroll-rtl var(--marquee-duration, 12s) linear infinite, rainbow-glow 3s linear infinite !important;
+        }
+        @keyframes rainbow-glow { 0% { background-position: 0% center; } 100% { background-position: 300% center; } }
 
         .floating-btn {
-            position: absolute; bottom: 24px; right: 24px; z-index: 10;
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            position: absolute; bottom: 24px; right: 24px; z-index: 50;
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff;
-            padding: 12px 20px; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer;
+            padding: 14px 24px; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer;
+        }
+
+        .toast-notice {
+            position: absolute; top: 24px; left: 50%; transform: translateX(-50%); z-index: 60;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; color: rgba(255, 255, 255, 0.9);
+            pointer-events: none; opacity: 1; transition: opacity 1s ease;
         }
 
         .control-panel {
             position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(0);
-            width: calc(100% - 40px); max-width: 860px; max-height: 85vh; overflow-y: auto; z-index: 20;
-            background: rgba(18, 18, 28, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); transition: transform 0.3s ease, opacity 0.3s ease;
+            width: calc(100% - 40px); max-width: 900px; max-height: 85vh; overflow-y: auto; z-index: 100;
+            background: rgba(16, 16, 26, 0.92); backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 24px; padding: 24px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8); transition: transform 0.3s ease, opacity 0.3s ease;
         }
         .control-panel.hidden { transform: translateX(-50%) translateY(120%); opacity: 0; pointer-events: none; }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px; }
-        .panel-actions { display: flex; gap: 8px; }
-        .icon-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; padding: 8px 14px; border-radius: 10px; font-weight: 600; cursor: pointer; }
-        .panel-body { display: flex; flex-direction: column; gap: 18px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); padding-bottom: 14px; }
+        .btn-fullscreen-header { background: linear-gradient(135deg, #ff007f, #7f00ff); border: none; color: #fff; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .icon-btn { background: rgba(255, 255, 255, 0.1); border: none; color: #fff; padding: 10px 16px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+        .panel-body { display: flex; flex-direction: column; gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .input-group label { font-size: 0.85rem; font-weight: 600; color: rgba(255, 255, 255, 0.7); }
-        .input-group input[type="text"] { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #fff; font-size: 1.05rem; outline: none; }
+        .input-group label { font-size: 0.85rem; font-weight: 600; color: rgba(255, 255, 255, 0.75); }
+        .input-group input[type="text"] { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #fff; font-size: 1.05rem; outline: none; }
+
+        .file-upload-box { display: flex; align-items: center; gap: 12px; background: rgba(0, 0, 0, 0.3); border: 1px dashed rgba(255, 255, 255, 0.3); padding: 14px; border-radius: 14px; }
+        .btn-file-custom { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); color: #fff; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+        .btn-file-remove { background: rgba(255, 50, 50, 0.2); border: 1px solid rgba(255, 50, 50, 0.4); color: #ff6b6b; padding: 8px 14px; border-radius: 10px; cursor: pointer; display: none; }
+
         .preset-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
-        .btn-preset { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #eee; padding: 6px 12px; border-radius: 8px; cursor: pointer; }
-        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
-        .btn-toggle-group { display: flex; background: rgba(0, 0, 0, 0.4); padding: 4px; border-radius: 10px; gap: 4px; }
-        .btn-toggle { flex: 1; background: transparent; border: none; color: rgba(255, 255, 255, 0.6); padding: 8px 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-preset { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #eee; padding: 8px 14px; border-radius: 10px; cursor: pointer; }
+        .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+        .btn-toggle-group { display: flex; background: rgba(0, 0, 0, 0.5); padding: 4px; border-radius: 12px; gap: 4px; }
+        .btn-toggle { flex: 1; background: transparent; border: none; color: rgba(255, 255, 255, 0.6); padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; }
         .btn-toggle.active { background: #ff007f; color: #fff; }
-        .btn-primary { background: #ff007f; border: none; color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .btn-primary { background: #ff007f; border: none; color: #fff; padding: 12px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        .btn-color-effect { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+        .btn-color-effect.active { border-color: #00ffff; box-shadow: 0 0 10px #00ffff; }
+        .color-effects-wrapper { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
         .color-picker-wrapper { display: flex; align-items: center; gap: 10px; }
-        input[type="color"] { -webkit-appearance: none; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; background: none; }
+        input[type="color"] { -webkit-appearance: none; border: none; width: 44px; height: 44px; border-radius: 10px; cursor: pointer; background: none; }
         select, input[type="range"] { width: 100%; accent-color: #ff007f; }
-        select { padding: 10px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 10px; color: #fff; outline: none; }
+        select { padding: 12px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: #fff; outline: none; }
         select option { background: #12121c; color: #fff; }
     </style>
 </head>
 <body>
-    <div id="marquee-container" class="marquee-container theme-neon">
+    <div id="marquee-container" class="marquee-container">
         <div class="led-grid-overlay"></div>
+        <div id="toast-notice" class="toast-notice">💡 화면을 더블클릭하면 설정창을 숨기거나 전체화면으로 볼 수 있습니다!</div>
+
         <div class="display-stage">
-            <div id="marquee-text" class="marquee-text dir-rtl">원하는 문장을 입력하세요! 🚀</div>
+            <div id="center-media-container" class="center-media-container"></div>
+            <div class="marquee-text-wrapper">
+                <div id="marquee-text" class="marquee-text dir-rtl">원하는 문장을 입력하세요! 🚀</div>
+            </div>
         </div>
 
-        <button id="btn-show-controls" class="floating-btn">⚙️ 설정</button>
+        <button id="btn-show-controls" class="floating-btn">⚙️ 설정 열기</button>
 
         <div id="control-panel" class="control-panel">
             <div class="panel-header">
-                <h2>✨ 전광판 설정</h2>
+                <h2>✨ 네온 전광판 멀티 컨트롤러</h2>
                 <div class="panel-actions">
-                    <button id="btn-fullscreen" class="icon-btn">🖥️ 전체화면</button>
-                    <button id="btn-hide-controls" class="icon-btn">✕</button>
+                    <button id="btn-fullscreen-top" class="btn-fullscreen-header">🖥️ 전체화면 모드</button>
+                    <button id="btn-hide-controls" class="icon-btn">✕ 닫기</button>
                 </div>
             </div>
 
             <div class="panel-body">
                 <div class="input-group">
-                    <label>문구 입력</label>
+                    <label for="text-input">문구 입력</label>
                     <input type="text" id="text-input" value="원하는 문장을 입력하세요! 🚀">
                 </div>
 
                 <div class="input-group">
-                    <label>빠른 문구 선택</label>
+                    <label>🖼️ 가운데 파일 넣기 (이미지 / GIF / 동영상)</label>
+                    <div class="file-upload-box">
+                        <label for="file-input" class="btn-file-custom">📁 파일 선택 (이미지/GIF/영상)</label>
+                        <input type="file" id="file-input" accept="image/*,video/*" style="display: none;">
+                        <span id="file-name-display" style="font-size: 0.85rem; color: rgba(255,255,255,0.7);">선택된 파일 없음</span>
+                        <button id="btn-remove-file" class="btn-file-remove">삭제</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>빠른 예시 문구</label>
                     <div class="preset-buttons">
                         <button class="btn-preset" data-text="🎉 축하합니다! 🎉">🎉 축하</button>
                         <button class="btn-preset" data-text="❤️ 사랑해요 ❤️">❤️ 고백</button>
@@ -134,8 +183,8 @@
                     <div class="input-group">
                         <label>이동 방향</label>
                         <div class="btn-toggle-group">
-                            <button id="dir-rtl" class="btn-toggle active">오른쪽 ➔ 왼쪽</button>
-                            <button id="dir-ltr" class="btn-toggle">왼쪽 ➔ 오른쪽</button>
+                            <button id="dir-rtl" class="btn-toggle active" data-dir="rtl">오른쪽 ➔ 왼쪽</button>
+                            <button id="dir-ltr" class="btn-toggle" data-dir="ltr">왼쪽 ➔ 오른쪽</button>
                         </div>
                     </div>
 
@@ -145,17 +194,17 @@
                     </div>
 
                     <div class="input-group">
-                        <label>이동 속도 (<span id="speed-val">5</span>)</label>
+                        <label for="speed-range">이동 속도 (<span id="speed-val">5</span>)</label>
                         <input type="range" id="speed-range" min="1" max="10" value="5">
                     </div>
 
                     <div class="input-group">
-                        <label>글자 크기 (<span id="size-val">20</span>vw)</label>
+                        <label for="size-range">글자 크기 (<span id="size-val">20</span>vw)</label>
                         <input type="range" id="size-range" min="8" max="40" value="20">
                     </div>
 
                     <div class="input-group">
-                        <label>글꼴 선택</label>
+                        <label for="font-select">글꼴 선택</label>
                         <select id="font-select">
                             <option value="'Black Han Sans', sans-serif">블랙한산 (기본)</option>
                             <option value="'Do Hyeon', sans-serif">도현체</option>
@@ -165,25 +214,24 @@
                     </div>
 
                     <div class="input-group">
-                        <label>테마 선택</label>
-                        <select id="theme-select">
-                            <option value="theme-neon">네온 분홍 (Cyber)</option>
-                            <option value="theme-led-red">클래식 레드 LED</option>
-                            <option value="theme-matrix">매트릭스 그린</option>
-                            <option value="theme-gold">황금빛 골드</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group">
-                        <label>글자 색상</label>
-                        <div class="color-picker-wrapper">
-                            <input type="color" id="text-color" value="#ff007f">
-                            <button id="btn-rainbow-text" class="btn-secondary">🌈 무지개</button>
+                        <label>특수 색상 효과 (무지개 & 멀티컬러)</label>
+                        <div class="color-effects-wrapper">
+                            <button class="btn-color-effect" data-effect="rainbow">🌈 무지개 물결</button>
+                            <button class="btn-color-effect" data-effect="cyber">⚡ 사이버 네온</button>
+                            <button class="btn-color-effect" data-effect="fire">🔥 파이어 네온</button>
+                            <button class="btn-color-effect" data-effect="none">단색 모드</button>
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <label>배경 색상</label>
+                        <label for="text-color">단색 글자 색상</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="text-color" value="#ff007f">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="bg-color">배경 색상</label>
                         <input type="color" id="bg-color" value="#080312">
                     </div>
                 </div>
@@ -204,18 +252,23 @@
             const sizeRange = document.getElementById('size-range');
             const sizeVal = document.getElementById('size-val');
             const fontSelect = document.getElementById('font-select');
-            const themeSelect = document.getElementById('theme-select');
             const textColorInput = document.getElementById('text-color');
             const bgColorInput = document.getElementById('bg-color');
-            const rainbowBtn = document.getElementById('btn-rainbow-text');
             const controlPanel = document.getElementById('control-panel');
             const showControlsBtn = document.getElementById('btn-show-controls');
             const hideControlsBtn = document.getElementById('btn-hide-controls');
-            const fullscreenBtn = document.getElementById('btn-fullscreen');
+            const fullscreenTopBtn = document.getElementById('btn-fullscreen-top');
             const presetButtons = document.querySelectorAll('.btn-preset');
+            const toastNotice = document.getElementById('toast-notice');
+
+            const fileInput = document.getElementById('file-input');
+            const fileNameDisplay = document.getElementById('file-name-display');
+            const btnRemoveFile = document.getElementById('btn-remove-file');
+            const centerMediaContainer = document.getElementById('center-media-container');
 
             let isPlaying = true;
-            let isRainbow = false;
+
+            setTimeout(() => { toastNotice.style.opacity = '0'; }, 4000);
 
             textInput.addEventListener('input', (e) => {
                 const text = e.target.value.trim();
@@ -243,7 +296,6 @@
                     dirRtlBtn.classList.remove('active');
                 }
             }
-
             dirRtlBtn.addEventListener('click', () => setDirection('rtl'));
             dirLtrBtn.addEventListener('click', () => setDirection('ltr'));
 
@@ -273,40 +325,62 @@
 
             fontSelect.addEventListener('change', (e) => { marqueeText.style.fontFamily = e.target.value; });
 
-            themeSelect.addEventListener('change', (e) => {
-                const theme = e.target.value;
-                marqueeContainer.className = `marquee-container ${theme}`;
-                if (isRainbow) { isRainbow = false; marqueeText.classList.remove('rainbow-active'); }
-                switch (theme) {
-                    case 'theme-neon': textColorInput.value = '#ff007f'; bgColorInput.value = '#080312'; break;
-                    case 'theme-led-red': textColorInput.value = '#ff1100'; bgColorInput.value = '#0d0000'; break;
-                    case 'theme-matrix': textColorInput.value = '#00ff44'; bgColorInput.value = '#000d03'; break;
-                    case 'theme-gold': textColorInput.value = '#ffd700'; bgColorInput.value = '#120e00'; break;
-                }
-                marqueeText.style.color = textColorInput.value;
-                marqueeContainer.style.backgroundColor = bgColorInput.value;
+            const effectButtons = document.querySelectorAll('.btn-color-effect');
+            effectButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    effectButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const effect = btn.getAttribute('data-effect');
+                    marqueeText.classList.remove('effect-rainbow', 'effect-cyber', 'effect-fire');
+
+                    if (effect === 'rainbow') marqueeText.classList.add('effect-rainbow');
+                    else if (effect === 'cyber') marqueeText.classList.add('effect-cyber');
+                    else if (effect === 'fire') marqueeText.classList.add('effect-fire');
+                    else marqueeText.style.color = textColorInput.value;
+                });
             });
 
             textColorInput.addEventListener('input', (e) => {
-                if (isRainbow) { isRainbow = false; marqueeText.classList.remove('rainbow-active'); }
+                marqueeText.classList.remove('effect-rainbow', 'effect-cyber', 'effect-fire');
+                effectButtons.forEach(b => b.classList.remove('active'));
                 marqueeText.style.color = e.target.value;
             });
 
             bgColorInput.addEventListener('input', (e) => { marqueeContainer.style.backgroundColor = e.target.value; });
 
-            rainbowBtn.addEventListener('click', () => {
-                isRainbow = !isRainbow;
-                if (isRainbow) {
-                    marqueeText.classList.add('rainbow-active');
-                    rainbowBtn.style.background = 'linear-gradient(45deg, #ff007f, #00e5ff)';
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                fileNameDisplay.textContent = file.name;
+                btnRemoveFile.style.display = 'inline-block';
+
+                const fileURL = URL.createObjectURL(file);
+                centerMediaContainer.innerHTML = '';
+
+                if (file.type.startsWith('video/')) {
+                    const videoElem = document.createElement('video');
+                    videoElem.src = fileURL;
+                    videoElem.className = 'center-media-item';
+                    videoElem.autoplay = true; videoElem.loop = true; videoElem.muted = true; videoElem.playsInline = true;
+                    centerMediaContainer.appendChild(videoElem);
                 } else {
-                    marqueeText.classList.remove('rainbow-active');
-                    rainbowBtn.style.background = '';
-                    marqueeText.style.color = textColorInput.value;
+                    const imgElem = document.createElement('img');
+                    imgElem.src = fileURL;
+                    imgElem.className = 'center-media-item';
+                    centerMediaContainer.appendChild(imgElem);
                 }
+                centerMediaContainer.classList.add('active');
+            });
+
+            btnRemoveFile.addEventListener('click', () => {
+                fileInput.value = ''; fileNameDisplay.textContent = '선택된 파일 없음';
+                btnRemoveFile.style.display = 'none'; centerMediaContainer.innerHTML = '';
+                centerMediaContainer.classList.remove('active');
             });
 
             hideControlsBtn.addEventListener('click', () => { controlPanel.classList.add('hidden'); showControlsBtn.style.display = 'block'; });
+            showControlsBtn.style.display = 'none';
             showControlsBtn.addEventListener('click', () => { controlPanel.classList.remove('hidden'); showControlsBtn.style.display = 'none'; });
 
             marqueeContainer.addEventListener('dblclick', (e) => {
@@ -315,15 +389,13 @@
                 showControlsBtn.style.display = controlPanel.classList.contains('hidden') ? 'block' : 'none';
             });
 
-            fullscreenBtn.addEventListener('click', () => {
+            fullscreenTopBtn.addEventListener('click', () => {
                 if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => { alert(`전체화면 모드 오류: ${err.message}`); });
+                    document.documentElement.requestFullscreen().catch(err => { alert(`전체화면 전환 실패: ${err.message}`); });
                 } else {
                     if (document.exitFullscreen) document.exitFullscreen();
                 }
             });
-
-            showControlsBtn.style.display = 'none';
         }
 
         if (document.readyState === 'loading') {
@@ -333,4 +405,4 @@
         }
     </script>
 </body>
-</html>
+</html>4
